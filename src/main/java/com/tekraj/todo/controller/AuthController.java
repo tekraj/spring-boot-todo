@@ -1,43 +1,66 @@
 package com.tekraj.todo.controller;
 
-
 import com.tekraj.todo.dto.UserDto;
 import com.tekraj.todo.model.User;
 import com.tekraj.todo.service.CustomUserDetailsService;
+import com.tekraj.todo.service.UserService;
 import com.tekraj.todo.util.JwtUtil;
+
+import org.springframework.ui.Model;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
+	@Autowired
+	private UserService userService;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private JwtUtil jwtUtil;
+	@Autowired
+	private JwtUtil jwtUtil;
 
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
+	@Autowired
+	private CustomUserDetailsService userDetailsService;
 
-    @PostMapping("/login")
-    public String createAuthenticationToken(@RequestBody UserDto authRequest) throws Exception {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getEmail(), authRequest.getPassword())
-        );
+	@GetMapping("/login")
+	public String showLoginForm() {
+		return "index";
+	}
 
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getEmail());
+	@GetMapping("/register")
+	public String showRegistrationForm(Model model) {
+		UserDto user = new UserDto();
+		model.addAttribute("user", user);
+		return "register";
+	}
 
-        return jwtUtil.generateToken(userDetails.getUsername());
-    }
+	@PostMapping("/login")
+	public String createAuthenticationToken(@RequestBody UserDto authRequest) throws Exception {
+		User user = userService.findByEmail(authRequest.getEmail());
+		if (user == null) {
+			throw new Exception("User not found");
+		}
+		
+		String hashedPassword = passwordEncoder.encode(authRequest.getPassword());
 
-    @PostMapping("/register")
-    public String registerUser(@RequestBody User user) {
-        userDetailsService.saveUser(user); 
-        return "User registered successfully";
-    }
+		if (!passwordEncoder.matches(authRequest.getPassword(), user.getPassword())) {
+			return hashedPassword;
+		}
+		final UserDetails userDetails = userDetailsService.loadUserByUsername(authRequest.getEmail());
+
+		return jwtUtil.generateToken(userDetails.getUsername());
+	}
+
+	@PostMapping("/register")
+	public String registerUser(@RequestBody User user) {
+		userService.registerUser(user);
+		return "User registered successfully";
+	}
+
 }

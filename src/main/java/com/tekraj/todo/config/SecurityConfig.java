@@ -28,32 +28,28 @@ public class SecurityConfig {
 
 	@Bean
 	PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder(); // Use BCrypt for password encoding
+		return new BCryptPasswordEncoder(); 
 	}
 
 	@Bean
 	AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
 		AuthenticationManagerBuilder authenticationManagerBuilder = http
 				.getSharedObject(AuthenticationManagerBuilder.class);
-
-		authenticationManagerBuilder.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder()); // Use
-																														// BCryptPasswordEncoder
-																														// here
+		authenticationManagerBuilder.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder()); 																					// here
 
 		return authenticationManagerBuilder.build();
 	}
 
 	@Bean
-	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.csrf(csrf -> csrf.disable())
-        .authorizeHttpRequests(requests -> requests
-            .requestMatchers("/api/**").authenticated()  
-            .anyRequest().permitAll()                     
-        )
-				.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable()).authorizeHttpRequests(requests -> requests
+                        .requestMatchers("/api/admin/**").authenticated() 
+                        .requestMatchers("/api/**").authenticated() 
+                        .anyRequest().permitAll()) 
+                .sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-		http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
-		return http.build();
-	}
+        return http.build();
+    }
 }

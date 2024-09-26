@@ -1,6 +1,5 @@
 package com.tekraj.todo.service;
 
-import com.tekraj.todo.dto.UserDto;
 import com.tekraj.todo.model.User;
 import com.tekraj.todo.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +15,7 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public User registerUser(UserDto userDto) {
+    public User registerUser(User userDto) {
         User user = new User();
         user.setEmail(userDto.getEmail());
         user.setName(userDto.getName());
