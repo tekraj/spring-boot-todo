@@ -110,5 +110,16 @@ public class Student {
 	protected void onUpdate() {
 		this.updatedAt = LocalDate.now();
 	}
+	@Transient
+    private String dateOfBirthFormatted;
+	
+	// Getters and Setters
+    public String getDateOfBirthFormatted() {
+        return dateOfBirthFormatted;
+    }
+
+    public void setDateOfBirthFormatted(String dateOfBirthFormatted) {
+        this.dateOfBirthFormatted = dateOfBirthFormatted;
+    }
 	
 }
