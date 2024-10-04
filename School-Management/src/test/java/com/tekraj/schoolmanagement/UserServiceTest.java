@@ -15,7 +15,6 @@ import org.mockito.MockitoAnnotations;
 
 import java.time.LocalDate;
 import java.util.Optional;
-
 class UserServiceTest {
 
     @Mock

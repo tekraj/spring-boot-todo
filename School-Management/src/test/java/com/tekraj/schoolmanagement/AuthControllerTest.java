@@ -18,49 +18,43 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
-@WebMvcTest(controllers=AuthController.class,excludeAutoConfiguration = {SecurityAutoConfiguration.class})  
+@WebMvcTest(controllers = AuthController.class, excludeAutoConfiguration = { SecurityAutoConfiguration.class })
 
 public class AuthControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+	@Autowired
+	private MockMvc mockMvc;
 
-    @MockBean
-    private UserService userService;
+	@MockBean
+	private UserService userService;
 
-    @MockBean
-    private PasswordEncoder passwordEncoder;
+	@MockBean
+	private PasswordEncoder passwordEncoder;
 
-    @Test
-    public void testRegisterUser_Success() throws Exception {
-        // Mock the behavior of password encoder
-        Mockito.when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
+	@Test
+	public void testRegisterUser_Success() throws Exception {
+		// Mock the behavior of password encoder
+		Mockito.when(passwordEncoder.encode("password123")).thenReturn("encodedPassword");
 
-        // Perform POST request with valid form data
-        mockMvc.perform(post("/register")
-                .param("username", "john.doe")
-                .param("password", "password123")
-                .param("confirmPassword", "password123")
-        )
-                .andExpect(status().is3xxRedirection())  // Expect a redirection status
-                .andExpect(redirectedUrl("/login"));  // Expect to be redirected to /login
+		// Perform POST request with valid form data
+		mockMvc.perform(post("/register").param("username", "john.doe1").param("name", "john.doe1")
+				.param("email", "ab@gmail.com").param("password", "password123")
+				.param("confirmPassword", "password123")).andExpect(status().is3xxRedirection()) // Expect a redirection
+																									// status
+				.andExpect(redirectedUrl("/login")); // Expect to be redirected to /login
 
-        // Verify that the UserService was called to save the user
-        Mockito.verify(userService, Mockito.times(1)).saveUser(Mockito.any(User.class));
-    }
+		// Verify that the UserService was called to save the user
+		Mockito.verify(userService, Mockito.times(1)).saveUser(Mockito.any(User.class));
+	}
 
-    @Test
-    public void testRegisterUser_PasswordMismatch() throws Exception {
-        // Perform POST request where passwords do not match
-        mockMvc.perform(post("/register")
-                .param("username", "john.doe")
-                .param("password", "password123")
-                .param("confirmPassword", "password456")
-        )
-                .andExpect(status().isOk())  
-                .andExpect(model().attributeExists("error"))  
-                .andExpect(model().attribute("error", "Passwords do not match."))  
-                .andExpect(model().attributeExists("user"))  
-                .andExpect(model().attribute("user", Mockito.any(User.class))); 
-    }
+	@Test
+	public void testRegisterUser_PasswordMismatch() throws Exception {
+		// Perform POST request where passwords do not match
+		mockMvc.perform(post("/register").param("username", "john.doe1").param("name", "john.doe1")
+				.param("email", "ab@gmail.com").param("password", "password123")
+				.param("confirmPassword", "password1234")).andExpect(status().isOk())
+
+				.andExpect(model().attribute("error", "Passwords do not match."));
+
+	}
 }

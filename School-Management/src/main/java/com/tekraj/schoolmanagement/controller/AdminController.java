@@ -11,9 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/admin")
 public class AdminController {
 	
-
+	
 	
 	@GetMapping({"","/"})
+	
 	public String dashboard(Model model) {
 		model.addAttribute("title","Admin");
 		return "admin/index";
